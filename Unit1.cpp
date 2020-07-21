@@ -3,14 +3,22 @@
 #include <vcl.h>
 #pragma hdrstop
 
+
+
 #include "Unit1.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
+
 TForm1 *Form1;
 
 int x = -8;
 int y = -8;
+
+int leftScore = 0;
+int rightScore = 0;
+
+int count = 0;
 
 
 //---------------------------------------------------------------------------
@@ -25,32 +33,82 @@ void __fastcall TForm1::TimerBallTimer(TObject *Sender)
          ball->Left+= x;
         ball->Top+= y;
 
-        if (ball->Left - 5 <= 0) x= -x;
-
-        if (ball->Left +ball->Width +5 >= background->Width) x= -x;
-
         if (ball->Top - 5 <= 0) y= -y;
 
         if (ball->Top + ball->Height + 5 >= background->Height) y= -y;
 
-         if (ball->Left + ball->Width + 15 <= paddle1->Left + paddle1->Width)
+         if (ball->Left + ball->Width + 5 <= paddle1->Left + paddle1->Width)
         {
+                rightScore ++;
+
                 TimerBall->Enabled = false;
                 ball->Visible = false;
+                LabelWelcome->Caption = " Punkt dla gracza prawego >";
+                LabelScore->Caption = IntToStr(leftScore) + " : "+ IntToStr(rightScore);
+                LabelScore->Visible = true;
+
+                LabelCount->Caption = "Ilosc odbic :" + IntToStr(count);
+                LabelCount->Visible = true;
+
+                LabelWelcome->Visible = true;
+                ButtonNewGame->Visible = true;
+                ButtonNewGame->Enabled = true;
+
+                ButtonNewRound->Visible = true;
+
         } else if (ball->Top > paddle1->Top - ball->Height/2 && ball->Top < paddle1->Top + paddle1->Height &&
                 ball->Left < paddle1->Left + paddle1->Width )
                {
+                   count ++;
+
                    if (x<0) x= - x;
+
+
+                   if (ball->Top + ball->Height/2 >= paddle1->Top + paddle1->Height/2 - 25
+                   && ball->Top + ball->Height/2 <= paddle1->Top + paddle1->Height/2 +25)
+                   {
+                   if (TimerBall->Interval - 5 > 0) TimerBall->Interval-=3;
+
+                   }   else TimerBall->Interval = 18;
+
+
                }
 
-         if (ball->Left >= paddle2->Left + paddle2->Width +15)
+         if (ball->Left >= paddle2->Left +5)
          {
+                leftScore ++;
+
                 TimerBall->Enabled = false;
                 ball->Visible = false;
+                LabelWelcome->Caption = "< Punkt dla gracza lewego";
+                LabelScore->Caption = IntToStr(leftScore) + " : "+ IntToStr(rightScore);
+                LabelScore->Visible = true;
+
+                LabelCount->Caption = "Ilosc odbic :" + IntToStr(count);
+                LabelCount->Visible = true;
+
+                LabelWelcome->Visible = true;
+                ButtonNewGame->Visible = true;
+                ButtonNewGame->Enabled = true;
+
+                ButtonNewRound->Visible = true;
+
          } else if (ball->Top > paddle2->Top - ball->Height/2 && ball->Top < paddle2->Top + paddle2->Height &&
                 ball->Left + ball->Width > paddle2->Left )
                {
-                   if (x>0) x= - x;
+                count ++;
+
+                if (x>0) x= - x;
+
+
+                if (ball->Top + ball->Height/2 >= paddle2->Top + paddle2->Height/2 - 25
+                   && ball->Top + ball->Height/2 <= paddle2->Top + paddle2->Height/2 +25)
+                   {
+                   if (TimerBall->Interval - 5 > 0) TimerBall->Interval-=3;
+
+                   }  else TimerBall->Interval = 18;
+
+
                }
 
 }
@@ -96,6 +154,55 @@ void __fastcall TForm1::FormKeyDown(TObject *Sender, WORD &Key,
         if (Key == 0x5A) paddle1Down->Enabled = true;
         if (Key == VK_UP) paddle2Up->Enabled = true;
         if (Key == VK_DOWN) paddle2Down->Enabled = true;
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TForm1::ButtonNewGameClick(TObject *Sender)
+{
+        count = 0;
+        ball->Top = 500;
+        ball->Left = 500;
+        ball->Visible = true;
+        TimerBall->Interval = 20;
+        TimerBall->Enabled = true;
+        LabelCount->Visible = false;
+    LabelWelcome->Visible = false;
+    ButtonNewGame->Visible = false;
+    LabelScore->Visible = false;
+    ButtonNewRound->Visible = false;
+
+    leftScore =0;
+    rightScore = 0;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::FormCreate(TObject *Sender)
+{
+   ShowMessage("Witaj w grze PingPong.\n\n"
+                 "Lewy gracz steruje wciskaj¹c A oraz Z.\n"
+                 "Prawy gracz steruje wciskaj¹c strza³ki do góry i w dó³.\n\n"
+                 "Dla urozmaicenia zabawy:\n"
+                 "Kiedy odbijesz pi³kê na srodku paletki, wówczas pi³ka przyspieszy\n"
+                 "Im d³u¿ej odbijasz, tym pi³ka szybciej siê przemieszcza.\n\n"
+                 "Mi³ej zabawy!.");
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::ButtonNewRoundClick(TObject *Sender)
+{
+      count = 0;
+       ball->Top = 500;
+        ball->Left = 500;
+        ball->Visible = true;
+        TimerBall->Interval = 20;
+        TimerBall->Enabled = true;
+        LabelCount->Visible = false;
+    LabelWelcome->Visible = false;
+    ButtonNewGame->Visible = false;
+    LabelScore->Visible = false;
+    ButtonNewRound->Visible = false;
 }
 //---------------------------------------------------------------------------
 
